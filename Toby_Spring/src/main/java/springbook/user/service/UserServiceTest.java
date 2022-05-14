@@ -39,6 +39,8 @@ public class UserServiceTest {
 	UserDao userDao;
 	@Autowired
 	DataSource dataSource;
+	@Autowired
+	MailSender mailSender;
 	
 	List<User> users;
 	
@@ -46,11 +48,11 @@ public class UserServiceTest {
 	public void setUp() {
 		// asList = 배열을 리스트로 만들어주는 편리한 메소드. 배열을 가변인자로 넣어주면 더욱 편리하다.
 		users = Arrays.asList(
-				new User("bumjin", "박범진", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
-				new User("joytouch", "강명성", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-				new User("erwins", "신승환", "p3", Level.SILVER, MIN_RECCOMEND_FOR_GOLD-1, 29),
-				new User("madnite1", "이상호", "p4", Level.SILVER, MIN_RECCOMEND_FOR_GOLD, 30),
-				new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE)
+				new User("bumjin", "박범진", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0, "fuswns96@naver.com"),
+				new User("joytouch", "강명성", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0, "이메일"),
+				new User("erwins", "신승환", "p3", Level.SILVER, MIN_RECCOMEND_FOR_GOLD-1, 29, "아무거나"),
+				new User("madnite1", "이상호", "p4", Level.SILVER, MIN_RECCOMEND_FOR_GOLD, 30, "넣읍시다"),
+				new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE, "안되면 나중에 바꾸지 뭐")
 		);
 	}
 	
@@ -103,6 +105,7 @@ public class UserServiceTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setTransactionManager(transactionManager);
 //		testUserService.setDataSource(this.dataSource);			필요없음
+		testUserService.setMailSender(mailSender);
 		
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);

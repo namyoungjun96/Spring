@@ -49,9 +49,9 @@ public class UserDaoTest {
 	public void setUp() {
 //		this.dao = context.getBean("userDao", UserDao.class);
 		
-		this.user = new User("dudwns12", "남영준", "1234", Level.BASIC, 1, 0);
-		this.user2 = new User("fuswns96", "나명준", "1234", Level.SILVER, 55, 10);
-		this.user3 = new User("dudwns", "남앵준", "1234", Level.GOLD, 100, 40);
+		this.user = new User("dudwns12", "남영준", "1234", Level.BASIC, 1, 0, "fuswns96@naver.com");
+		this.user2 = new User("fuswns96", "나명준", "1234", Level.SILVER, 55, 10, "ehdgornltls@naver.com");
+		this.user3 = new User("dudwns", "남앵준", "1234", Level.GOLD, 100, 40, "ehdgornltls96@naver.com");
 		
 //		System.out.println(this.context);
 //		System.out.println(this);
@@ -97,6 +97,7 @@ public class UserDaoTest {
 		user.setLevel(Level.GOLD);
 		user.setLogin(1000);
 		user.setRecommend(999);
+		user.setEmail("dkahffkd@naver.com");
 		dao.update(user);
 		
 		User userupdate = dao.get(user.getId());
@@ -161,6 +162,7 @@ public class UserDaoTest {
 		assertThat(user.getLevel(), is(user2.getLevel()));
 		assertThat(user.getLogin(), is(user2.getLogin()));
 		assertThat(user.getRecommend(), is(user2.getRecommend()));
+		assertThat(user.getEmail(), is(user2.getEmail()));
 	}
 	
 	@Test(expected = DuplicateKeyException.class)
