@@ -45,9 +45,10 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 public class UserServiceTest {
 	@Autowired PlatformTransactionManager transactionManager;
 	@Autowired UserService userService;
+	@Autowired UserService testUserService;
 	@Autowired UserDao userDao;
 	@Autowired DataSource dataSource;
-	@Autowired UserServiceImpl userServiceImpl;
+//	@Autowired UserServiceImpl userServiceImpl;
 	@Autowired MailSender mailSender;
 	@Autowired ApplicationContext context;
 
@@ -68,6 +69,8 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	public void upgradeLevels() throws Exception {
+		UserServiceImpl userServiceImpl = new UserServiceImpl();
+		
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
 		
@@ -126,16 +129,15 @@ public class UserServiceTest {
 	}
 
 	@Test
-	@DirtiesContext
 	public void upgradeAllOrNothing() throws Exception {
-		UserServiceImpl testUserService = new TestUserService(users.get(3).getId());
-		testUserService.setUserDao(userDao);
+//		UserServiceImpl testUserService = new TestUserServiceImpl();
+//		testUserService.setUserDao(userDao);
 		//		testUserService.setDataSource(this.dataSource);			필요없음
-		testUserService.setMailSender(mailSender);
-		
-		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-		txProxyFactoryBean.setTarget(testUserService);
-		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+//		testUserService.setMailSender(mailSender);
+//		
+//		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
+//		txProxyFactoryBean.setTarget(testUserService);
+//		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 		
 //		TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
 //		txProxyFactoryBean.setTarget(testUserService);
@@ -145,10 +147,10 @@ public class UserServiceTest {
 //		txUserService.setTransactionManager(transactionManager);
 //		txUserService.setUserService(testUserService);
 		
-		TransactionHandler txHandler = new TransactionHandler();
-		txHandler.setTarget(testUserService);
-		txHandler.setTransactionManager(transactionManager);
-		txHandler.setPattern("upgradeLevels");
+//		TransactionHandler txHandler = new TransactionHandler();
+//		txHandler.setTarget(testUserService);
+//		txHandler.setTransactionManager(transactionManager);
+//		txHandler.setPattern("upgradeLevels");
 		
 //		UserService txUserService = (UserService)Proxy.newProxyInstance(
 //				getClass().getClassLoader(),
@@ -159,7 +161,7 @@ public class UserServiceTest {
 		for(User user : users) userDao.add(user);
 
 		try {
-			txUserService.upgradeLevels();
+			this.testUserService.upgradeLevels();
 //			fail("TestUserServiceException expected");
 		} catch(TestUserServiceException e) {} 
 		finally { checkLevelUpgraded(users.get(1), false); }
@@ -192,12 +194,12 @@ public class UserServiceTest {
 		assertThat(mailMessages.get(1).getTo()[0], equalTo(users.get(3).getEmail()));
 	}
 
-	static class TestUserService extends UserServiceImpl {
-		private String id;
+	static class TestUserServiceImpl extends UserServiceImpl {
+		private String id = "madnite1";
 
-		private TestUserService(String id) {
-			this.id = id;
-		}
+//		private TestUserService(String id) {
+//			this.id = id;
+//		}
 
 		protected void upgradeLevel(User user) {
 			if(user.getId().equals(this.id)) throw new TestUserServiceException();

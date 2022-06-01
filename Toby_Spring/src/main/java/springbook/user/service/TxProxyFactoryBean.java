@@ -41,6 +41,10 @@ public class TxProxyFactoryBean implements FactoryBean<Object> {
 	@Override
 	public Class<?> getObjectType() {
 		// TODO Auto-generated method stub
-		return null;
+		return serviceInterface;
+	}
+	
+	public boolean isSingleton() {
+		return false;
 	}
 }
