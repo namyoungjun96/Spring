@@ -193,6 +193,11 @@ public class UserServiceTest {
 		assertThat(mailMessages.get(0).getTo()[0], equalTo(users.get(1).getEmail()));
 		assertThat(mailMessages.get(1).getTo()[0], equalTo(users.get(3).getEmail()));
 	}
+	
+	@Test
+	public void advisorAutoProxyCreator() {
+		assertThat(testUserService, equalTo(java.lang.reflect.Proxy.class));
+	}
 
 	static class TestUserServiceImpl extends UserServiceImpl {
 		private String id = "madnite1";
