@@ -136,4 +136,26 @@ public class UserServiceImpl implements UserService {
 		
 		this.mailSender.send(mailMessage);
 	}
+
+	@Override
+	public User get(String id) {
+		// TODO Auto-generated method stub
+		return userDao.get(id);
+	}
+
+	@Override
+	public List<User> getAll() {
+		// TODO Auto-generated method stub
+		return userDao.getAll();
+	}
+
+	@Override
+	public void deleteAll() {
+		userDao.deleteAll();
+	}
+
+	@Override
+	public void update(User user) {
+		userDao.update(user);
+	}
 }

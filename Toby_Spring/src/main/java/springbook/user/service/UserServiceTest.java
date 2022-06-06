@@ -198,8 +198,13 @@ public class UserServiceTest {
 	public void advisorAutoProxyCreator() {
 		assertThat(testUserService, equalTo(java.lang.reflect.Proxy.class));
 	}
+	
+	@Test
+	public void readOnlyTransactionAttribute() {
+		testUserService.getAll();
+	}
 
-	static class TestUserServiceImpl extends UserServiceImpl {
+	static class TestUserService extends UserServiceImpl {
 		private String id = "madnite1";
 
 //		private TestUserService(String id) {
@@ -209,6 +214,14 @@ public class UserServiceTest {
 		protected void upgradeLevel(User user) {
 			if(user.getId().equals(this.id)) throw new TestUserServiceException();
 			super.upgradeLevel(user);
+		}
+		
+		public List<User> getAll() {
+			for(User user : super.getAll()) {
+				super.update(user);
+			}
+			
+			return null;
 		}
 	}
 
