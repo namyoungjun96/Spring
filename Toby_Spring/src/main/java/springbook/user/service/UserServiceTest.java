@@ -1,5 +1,6 @@
 package springbook.user.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -21,12 +22,17 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import springbook.learningtest.jdk.proxy.Hello;
 import springbook.learningtest.jdk.proxy.HelloTarget;
@@ -48,7 +54,7 @@ public class UserServiceTest {
 	@Autowired UserService testUserService;
 	@Autowired UserDao userDao;
 	@Autowired DataSource dataSource;
-//	@Autowired UserServiceImpl userServiceImpl;
+	//	@Autowired UserServiceImpl userServiceImpl;
 	@Autowired MailSender mailSender;
 	@Autowired ApplicationContext context;
 
@@ -67,31 +73,59 @@ public class UserServiceTest {
 	}
 
 	@Test
+	@Transactional
+	@Rollback(false)
+	public void transactionSync() {
+		userService.deleteAll();
+		userService.add(users.get(0));
+		userService.add(users.get(1));
+		
+//		userDao.deleteAll();
+//		assertThat(userDao.getCount(), equalTo(0));
+//
+//		DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+//		txDefinition.setReadOnly(true);
+//		TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+//
+//		try {
+//			userService.deleteAll();
+//
+//			userService.add(users.get(0));
+//			userService.add(users.get(1));
+//		} finally {
+//			transactionManager.rollback(txStatus);
+//			assertThat(userDao.getCount(), equalTo(2));
+//			assertThat(userDao.getCount(), equalTo(0));
+//		}
+		//		transactionManager.commit(txStatus);
+	}
+
+	@Test
 	@DirtiesContext
 	public void upgradeLevels() throws Exception {
 		UserServiceImpl userServiceImpl = new UserServiceImpl();
-		
+
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
-		
+
 		MockUserDao mockUserDao = new MockUserDao(this.users);
 		userServiceImpl.setUserDao(mockUserDao);
- 
+
 		MockMailSender mockMailSender = new MockMailSender();
 		userServiceImpl.setMailSender(mockMailSender);
 
 		userServiceImpl.upgradeLevels();
-		
+
 		List<User> updated = mockUserDao.getUpdated();
 		assertThat(updated.size(), equalTo(2));
 		checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
 		checkUserAndLevel(updated.get(1), "madnite1", Level.GOLD);
 
-//		checkLevelUpgraded(users.get(0), false);
-//		checkLevelUpgraded(users.get(1), true);
-//		checkLevelUpgraded(users.get(2), false);
-//		checkLevelUpgraded(users.get(3), true);
-//		checkLevelUpgraded(users.get(4), false);
+		//		checkLevelUpgraded(users.get(0), false);
+		//		checkLevelUpgraded(users.get(1), true);
+		//		checkLevelUpgraded(users.get(2), false);
+		//		checkLevelUpgraded(users.get(3), true);
+		//		checkLevelUpgraded(users.get(4), false);
 
 		List<String> request = mockMailSender.getRequests();
 		assertThat(request.size(), equalTo(2));
@@ -130,97 +164,99 @@ public class UserServiceTest {
 
 	@Test
 	public void upgradeAllOrNothing() throws Exception {
-//		UserServiceImpl testUserService = new TestUserServiceImpl();
-//		testUserService.setUserDao(userDao);
+		//		UserServiceImpl testUserService = new TestUserServiceImpl();
+		//		testUserService.setUserDao(userDao);
 		//		testUserService.setDataSource(this.dataSource);			필요없음
-//		testUserService.setMailSender(mailSender);
-//		
-//		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-//		txProxyFactoryBean.setTarget(testUserService);
-//		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-		
-//		TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
-//		txProxyFactoryBean.setTarget(testUserService);
-//		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+		//		testUserService.setMailSender(mailSender);
+		//		
+		//		ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
+		//		txProxyFactoryBean.setTarget(testUserService);
+		//		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
-//		UserServiceTx txUserService = new UserServiceTx();
-//		txUserService.setTransactionManager(transactionManager);
-//		txUserService.setUserService(testUserService);
-		
-//		TransactionHandler txHandler = new TransactionHandler();
-//		txHandler.setTarget(testUserService);
-//		txHandler.setTransactionManager(transactionManager);
-//		txHandler.setPattern("upgradeLevels");
-		
-//		UserService txUserService = (UserService)Proxy.newProxyInstance(
-//				getClass().getClassLoader(),
-//				new Class[] { UserService.class },
-//				txHandler);
+		//		TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+		//		txProxyFactoryBean.setTarget(testUserService);
+		//		UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
+		//		UserServiceTx txUserService = new UserServiceTx();
+		//		txUserService.setTransactionManager(transactionManager);
+		//		txUserService.setUserService(testUserService);
+
+		//		TransactionHandler txHandler = new TransactionHandler();
+		//		txHandler.setTarget(testUserService);
+		//		txHandler.setTransactionManager(transactionManager);
+		//		txHandler.setPattern("upgradeLevels");
+
+		//		UserService txUserService = (UserService)Proxy.newProxyInstance(
+		//				getClass().getClassLoader(),
+		//				new Class[] { UserService.class },
+		//				txHandler);
 
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
 
 		try {
 			this.testUserService.upgradeLevels();
-//			fail("TestUserServiceException expected");
+			//			fail("TestUserServiceException expected");
 		} catch(TestUserServiceException e) {} 
 		finally { checkLevelUpgraded(users.get(1), false); }
 	}
-	
+
 	@Test
 	public void mockUpgradeLevels() throws Exception {
 		UserServiceImpl userServiceImpl = new UserServiceImpl();
-		
+
 		UserDao mockUserDao = mock(UserDao.class);
 		when(mockUserDao.getAll()).thenReturn(this.users);
 		userServiceImpl.setUserDao(mockUserDao);
-		
+
 		MailSender mockMailSender = mock(MailSender.class);
 		userServiceImpl.setMailSender(mockMailSender);
-		
+
 		userServiceImpl.upgradeLevels();
-		
+
 		verify(mockUserDao, times(2)).update(any(User.class));
 		verify(mockUserDao, times(2)).update(any(User.class));
 		verify(mockUserDao).update(users.get(1));
 		assertThat(users.get(1).getLevel(), equalTo(Level.SILVER));
 		verify(mockUserDao).update(users.get(3));
 		assertThat(users.get(3).getLevel(), equalTo(Level.GOLD));
-		
+
 		ArgumentCaptor<SimpleMailMessage> mailMessageArg = ArgumentCaptor.forClass(SimpleMailMessage.class);
 		verify(mockMailSender, times(2)).send(mailMessageArg.capture());
 		List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
 		assertThat(mailMessages.get(0).getTo()[0], equalTo(users.get(1).getEmail()));
 		assertThat(mailMessages.get(1).getTo()[0], equalTo(users.get(3).getEmail()));
 	}
-	
+
 	@Test
 	public void advisorAutoProxyCreator() {
 		assertThat(testUserService, equalTo(java.lang.reflect.Proxy.class));
 	}
-	
+
 	@Test
 	public void readOnlyTransactionAttribute() {
-		testUserService.getAll();
+		assertThrows(TransientDataAccessResourceException.class, () -> {
+			testUserService.getAll();
+		});
 	}
 
 	static class TestUserService extends UserServiceImpl {
 		private String id = "madnite1";
 
-//		private TestUserService(String id) {
-//			this.id = id;
-//		}
+		//		private TestUserService(String id) {
+		//			this.id = id;
+		//		}
 
 		protected void upgradeLevel(User user) {
 			if(user.getId().equals(this.id)) throw new TestUserServiceException();
 			super.upgradeLevel(user);
 		}
-		
+
 		public List<User> getAll() {
 			for(User user : super.getAll()) {
 				super.update(user);
 			}
-			
+
 			return null;
 		}
 	}
@@ -246,24 +282,24 @@ public class UserServiceTest {
 	static class MockUserDao implements UserDao {
 		private List<User> users;
 		private List<User> updated = new ArrayList();
-		
+
 		private MockUserDao(List<User> users) {
 			this.users = users;
 		}
-		
+
 		public List<User> getUpdated(){
 			return this.updated;
 		}
-		
+
 		public List<User> getAll(){
 			return this.users;
 		}
-		
+
 		public void update(User user) {
 			updated.add(user);
 		}
 
-		
+
 		// 테스트에 사용되지 않는 메소드들
 		@Override
 		public void add(User user) { throw new UnsupportedOperationException(); }
@@ -274,12 +310,12 @@ public class UserServiceTest {
 		@Override
 		public int getCount() { throw new UnsupportedOperationException(); }
 	}
-	
+
 	private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
 		assertThat(updated.getId(), equalTo(expectedId));
 		assertThat(updated.getLevel(), equalTo(expectedLevel));
 	}
-	
+
 	//	@Test
 	//	public void bean() {
 	//		assertThat(this.userService, is(notNullValue()));
