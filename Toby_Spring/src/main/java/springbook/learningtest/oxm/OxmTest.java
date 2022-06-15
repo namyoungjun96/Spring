@@ -1,4 +1,4 @@
-package springbook.learningtest.oxm.Unmarshaller;
+package springbook.learningtest.oxm;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

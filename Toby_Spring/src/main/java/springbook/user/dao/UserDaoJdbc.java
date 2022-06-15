@@ -51,7 +51,6 @@ public class UserDaoJdbc implements UserDao {
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-
 	
  	public void add(final User user) throws DuplicateUserIdException {
  		try {
