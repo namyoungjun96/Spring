@@ -12,10 +12,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/Polymorphism-context.xml")
 public class PolymorphismTest {
-	@Autowired A a;
+	@Autowired Customer customer;
 	
 	@Test
-	public void printTest() {
-		assertThat(a.printName(), equalTo("my name is B"));
+	public void giveFood() {
+		assertThat(customer.orderFood(), equalTo("와퍼"));
 	}
 }
