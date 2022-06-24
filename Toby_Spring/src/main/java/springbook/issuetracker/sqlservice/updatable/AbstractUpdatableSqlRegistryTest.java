@@ -7,15 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import springbook.user.sqlservice.SqlNotFoundException;
 
 public abstract class AbstractUpdatableSqlRegistryTest {
 	UpdatableSqlRegistry sqlRegistry;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		sqlRegistry = createUpdatableSqlRegistry();
 		sqlRegistry.registerSql("KEY1", "SQL1");

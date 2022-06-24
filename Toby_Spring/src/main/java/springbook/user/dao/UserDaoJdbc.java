@@ -11,22 +11,29 @@ import javax.management.RuntimeErrorException;
 import javax.sql.DataSource;
 
 import org.mariadb.jdbc.MariaDbConnection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 import springbook.user.sqlservice.SqlService;
 
+@Repository("userDao")
 public class UserDaoJdbc implements UserDao {
-	private SqlService sqlService;
+	@Autowired private SqlService sqlService;
+	private JdbcTemplate jdbcTemplate;
 	
-	public void setSqlService(SqlService sqlService) {
-		this.sqlService = sqlService;
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	private RowMapper<User> userMapper = 
@@ -46,11 +53,6 @@ public class UserDaoJdbc implements UserDao {
 			};
 	
 //	private DataSource dataSource;
-	private JdbcTemplate jdbcTemplate;
-	
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
 	
  	public void add(final User user) throws DuplicateUserIdException {
  		try {

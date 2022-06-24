@@ -6,13 +6,14 @@
 						http://www.springframework.org/schema/context 
 						http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean id="a" class="springbook.learningtest.polymorphism.A">
-		<property name="b1" ref="b1"/>
+	<bean id="customer" class="springbook.learningtest.polymorphism.CustomerImpl">
+		<property name="bugerking" ref="bugerking"/>
 	</bean>
 
-	<bean id="b1" class="springbook.learningtest.polymorphism.B">
-		<property name="name" value="B" />
-		<property name="num" value="1" />
+	<bean id="bugerking" class="springbook.learningtest.polymorphism.Store">
+		<property name="hambuger" ref="hambuger" />
 	</bean>
+	
+	<bean id="hambuger" class="springbook.learningtest.polymorphism.Whopper"/>
 
 </beans> 

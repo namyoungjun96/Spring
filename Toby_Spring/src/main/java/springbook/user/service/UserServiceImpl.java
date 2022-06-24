@@ -6,10 +6,13 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -19,13 +22,10 @@ import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
-	UserDao userDao;
-	private MailSender mailSender;
-//	private PlatformTransactionManager transactionManager;
-//	DataSource dataSource;
-//	UserLevelUpgradePolicy userLevelUpgradePolicy;
-//	의존성 주입 성공
+	@Autowired private UserDao userDao;
+	@Autowired private MailSender mailSender;
 	
 	public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
 	public static final int MIN_RECCOMEND_FOR_GOLD = 30;
@@ -38,66 +38,11 @@ public class UserServiceImpl implements UserService {
 		this.mailSender = mailSender;
 	}
 	
-//	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-//		this.transactionManager = transactionManager;
-//	}
-	
-//	public void setDataSource(DataSource dataSource) {
-//		this.dataSource = dataSource;
-//	}
-	
-//	public void setUserLevelUpgradePolicy(UserLevelUpgradePolicy userLevelUpgradePolicy) {
-//		this.userLevelUpgradePolicy = userLevelUpgradePolicy;
-//	}				UserLevelUpgradePolicy를 DI 해준 LevelUpgrade를 가져온 모습
-	
 	public void upgradeLevels() {
 		List<User> users = userDao.getAll();
 		for(User user : users) {
 			if(canUpgradeLevel(user)) upgradeLevel(user);
 		}
-		
-//		TransactionSynchronizationManager.initSynchronization();
-//		Connection c = DataSourceUtils.getConnection(dataSource);
-//		c.setAutoCommit(false);
-		
-//		PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);	 의존성 주입까지해서 필요 없는듯
-//		TransactionStatus status = this.transactionManager.getTransaction(new DefaultTransactionDefinition());
-//		
-//		try {
-//			upgradeLevelsInternal();
-//			this.transactionManager.commit(status);
-//		} catch(Exception e) {
-//			this.transactionManager.rollback(status);
-//			throw e; 
-//		} 
-//		finally {
-//			DataSourceUtils.releaseConnection(c, dataSource);
-//			TransactionSynchronizationManager.unbindResource(this.dataSource);
-//			TransactionSynchronizationManager.clearSynchronization();
-//		}
-		
-//		for(User user : users) {
-//			if(userLevelUpgradePolicy.canUpgradeLevel(user)) userLevelUpgradePolicy.upgradeLevel(user);
-			
-//			if(canUpgradeLevel(user)) upgradeLevel(user);
-//		}			DI해준 LevelUpgrade를 쓰는 모습
-		
-//		for(User user : users) {
-//			Boolean changed = null;
-//			
-//			if(user.getLevel() == Level.BASIC && user.getLogin() >= 50) {
-//				user.setLevel(Level.SILVER);
-//				changed = true;
-//			}
-//			else if(user.getLevel() == Level.SILVER && user.getRecommend() >= 30) {
-//				user.setLevel(Level.GOLD);
-//				changed = true;
-//			}
-//			else if (user.getLevel() == Level.GOLD) changed = false;
-//			else changed = false;
-//			
-//			if(changed) userDao.update(user);
-//		}
 	}
 	
 	public void add(User user) {
@@ -121,10 +66,6 @@ public class UserServiceImpl implements UserService {
 		user.upgradeLevel();
 		userDao.update(user);
 		sendUpgradeEmail(user);
-		
-//		if (user.getLevel() == Level.BASIC) user.setLevel(Level.SILVER);
-//		else if (user.getLevel() == Level.SILVER) user.setLevel(Level.GOLD);
-//		userDao.update(user);
 	}
 	
 	private void sendUpgradeEmail(User user) {		

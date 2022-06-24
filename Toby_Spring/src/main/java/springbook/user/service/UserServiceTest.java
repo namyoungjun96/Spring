@@ -24,9 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,6 +39,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import springbook.learningtest.jdk.proxy.Hello;
 import springbook.learningtest.jdk.proxy.HelloTarget;
 import springbook.learningtest.jdk.proxy.UppercaseHandler;
+import springbook.user.config.AppContext;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -47,14 +50,13 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 // @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL) autowired를 생성자 주입 방식으로 만드는 어노테이션.
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/test-applicationContext.xml")
+@ContextConfiguration(classes = AppContext.class)
+@ActiveProfiles("test")
 public class UserServiceTest {
 	@Autowired PlatformTransactionManager transactionManager;
 	@Autowired UserService userService;
 	@Autowired UserService testUserService;
 	@Autowired UserDao userDao;
-	@Autowired DataSource dataSource;
-	//	@Autowired UserServiceImpl userServiceImpl;
 	@Autowired MailSender mailSender;
 	@Autowired ApplicationContext context;
 
@@ -240,7 +242,7 @@ public class UserServiceTest {
 		});
 	}
 
-	static class TestUserService extends UserServiceImpl {
+	public static class TestUserService extends UserServiceImpl {
 		private String id = "madnite1";
 
 		//		private TestUserService(String id) {

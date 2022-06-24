@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import springbook.user.domain.User;
 
 @Transactional
-interface UserService {
+public interface UserService {
 	void add(User user);
 	void deleteAll();
 	void update(User user);
