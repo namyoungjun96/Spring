@@ -11,6 +11,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -19,6 +23,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -36,22 +41,29 @@ import springbook.user.service.UserService;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "springbook.user")
-@Import(SqlServiceContext.class)
-public class AppContext {
+@EnableSqlService
+@PropertySource("/database.properties")
+public class AppContext implements SqlMapConfig {
+	@Autowired Environment env;
+	
 	/**
 	 * DB연결과 트랜잭션
 	 */
 	
 	@Bean
 	public DataSource dataSource() {
-		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+		SimpleDriverDataSource ds = new SimpleDriverDataSource();
 		
-		dataSource.setDriverClass(Driver.class);
-		dataSource.setUrl("jdbc:mysql://localhost/testdb?characterEncoding=UTF-8");
-		dataSource.setUsername("root");
-		dataSource.setPassword("1234");
+		try {
+			ds.setDriverClass((Class<? extends java.sql.Driver>)Class.forName(env.getProperty("db.driverClass")));
+		} catch(ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		ds.setUrl(env.getProperty("db.url"));
+		ds.setUsername(env.getProperty("db.username"));
+		ds.setPassword(env.getProperty("db.password"));
 		
-		return dataSource;
+		return ds;
 	}
 	
 	@Bean
@@ -88,4 +100,9 @@ public class AppContext {
 		}
 	}
 
+	@Override
+	public Resource getSqlMapResource() {
+		// TODO Auto-generated method stub
+		return new ClassPathResource("sqlmap.xml", UserDao.class);
+	}
 }
