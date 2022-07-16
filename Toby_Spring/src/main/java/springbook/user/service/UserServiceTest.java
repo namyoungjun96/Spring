@@ -51,7 +51,7 @@ import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = AppContext.class)
-@ActiveProfiles("test")
+@ActiveProfiles("test") 
 public class UserServiceTest {
 	@Autowired PlatformTransactionManager transactionManager;
 	@Autowired UserService userService;

@@ -5,8 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,8 +16,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import springbook.learningtest.spring.ioc.bean.Hello;
 import springbook.learningtest.spring.ioc.bean.Printer;
@@ -83,7 +80,7 @@ public class ApplicationContextTest {
 	public void genericApplicationContext() {
 //		GenericApplicationContext ac = new GenericApplicationContext();
 //		
-//		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(ac);
+//		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(ac);a
 //		reader.loadBeanDefinitions("springbook/learningtest/spring/ioc/genericApplicationContext.xml");
 //		
 //		ac.refresh();
