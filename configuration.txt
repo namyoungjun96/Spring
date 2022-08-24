@@ -1,0 +1,7 @@
+redis
+version: 3.0.504
+port: 6379
+
+google oauth
+clientId: 890384539494-d3nlvcrc7t8ucd77sjd4qlbtvkr6lpaq.apps.googleusercontent.com
+clientPassword: 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
