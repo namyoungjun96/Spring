@@ -2,9 +2,11 @@ package spring.study.login.config.auth;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import spring.study.login.domain.User;
 
@@ -19,12 +21,20 @@ import spring.study.login.domain.User;
 // Authentication Object 안에는 UserDetails type Object 만 들어갈 수 있다.
 // ** 프레임워크에서 정해놓은 방식임.
 
-public class PrincipalDetails implements UserDetails {
+public class PrincipalDetails implements UserDetails, OAuth2User {
 	
 	private User user;
+	private Map<String, Object> attributes;
 	
+	// 일반 로그인
 	public PrincipalDetails(User user) {
 		this.user = user;
+	}
+	
+	// OAuth 로그인
+	public PrincipalDetails(User user, Map<String, Object> attributes) {
+		this.user = user;
+		this.attributes = attributes;
 	}
 
 	// 해당 User의 권한을 return하는 곳!!
@@ -48,6 +58,10 @@ public class PrincipalDetails implements UserDetails {
 	public String getPassword() {
 		// TODO Auto-generated method stub
 		return user.getPassword();
+	}
+	
+	public User getUser() {
+		return user;
 	}
 
 	@Override
@@ -86,6 +100,18 @@ public class PrincipalDetails implements UserDetails {
 		// 이런식으로 다 logic을 관리할 수 있다.
 		
 		return true;
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		// TODO Auto-generated method stub
+		return attributes;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
