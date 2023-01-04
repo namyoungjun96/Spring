@@ -12,7 +12,7 @@ public class NamedParameterJdbcTemplateTest {
 	@Test
 	public void useObject() {
 		NamedParameterJdbcTemplate namedparamter = new NamedParameterJdbcTemplate(dataSource);
-		namedparamter.execute("insert into users(id, name, password, level, login, recommend, email) "
-				+ "values(?, ?, ?, ?, ?, ?, ?)", "jun", "준", "1234", "0", "100", "20", "jun.email");
+//		namedparamter.execute("insert into users(id, name, password, level, login, recommend, email) "
+//				+ "values(?, ?, ?, ?, ?, ?, ?)", "jun", "준", "1234", "0", "100", "20", "jun.email");
 	}
 }
